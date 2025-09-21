@@ -25,14 +25,18 @@ def treinar_modelo_random_forest(
                                     oob_score=False,                    # calcular out-of-bag score? (default False)
                                     class_weight=None,                  # balanceamento de classes ('balanced', dict ou None)
                                     n_jobs=-1,                          # núcleos paralelos (default -1 = todos)
+									min_samples_split=2, 
+                                    min_samples_leaf=1,
                                     random_state=42                     # semente para reprodutibilidade
                                 ):
 
-    # Fase 1 - Separar features e alvo
+
+	#####################################################################################
+	# Este algoritmo recebe o dataset completo por isso preciso separar em dados de
+	# treino e estes antes de treinar o modelo
+	#####################################################################################
     X = dados.drop(variavel_alvo, axis=1)
     y = dados[variavel_alvo]
-
-    # Fase 2 - Separar dados de treino e de teste
     X_train, X_test, y_train, y_test = train_test_split(
                                                             X,
                                                             y,
@@ -43,7 +47,7 @@ def treinar_modelo_random_forest(
     print("Divisão de dados concluída.")
     print("Distribuição das classes no treino antes do balanceamento:", y_train.value_counts().to_dict())
 
-    # Fase 3 - Definir a técnica de balanceamento
+    
     if tecnica_balanceamento == "smote":
         sampler = SMOTE(random_state=random_state)
     elif tecnica_balanceamento == "under":
@@ -55,7 +59,7 @@ def treinar_modelo_random_forest(
     else:
         raise ValueError("Escolha uma técnica de balanceamento válida: 'smote', 'under', 'smoteenn' ou 'nenhum'")
 
-    # Fase 4 - Construir o Pipeline
+    
     rf_clf = RandomForestClassifier(
                                         n_estimators=n_estimators,
                                         criterion=criterio,
@@ -65,6 +69,8 @@ def treinar_modelo_random_forest(
                                         oob_score=oob_score,
                                         class_weight=class_weight,
                                         n_jobs=n_jobs,
+										min_samples_split=min_samples_split, 
+										min_samples_leaf=min_samples_leaf,
                                         random_state=random_state
                                     )
     
@@ -80,8 +86,10 @@ def treinar_modelo_random_forest(
         ])
         print("Pipeline sem balanceamento e com Random Forest criada.")
 
-    # Fase 5 - Treinar e prever
+    #####################################################################################
+	# Treinar e prever 
+	#####################################################################################
     modelo_pipeline.fit(X_train, y_train)
     y_pred = modelo_pipeline.predict(X_test)
 
-    return modelo_pipeline, X_test, y_test, y_pred
+    return n_s
