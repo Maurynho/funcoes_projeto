@@ -11,7 +11,7 @@ from sklearn.metrics import (
 )
 import numpy as np
 
-def validar_random_forest(modelo, X_test, y_test):
+def validar_modelo_random_forest(modelo, X_test, y_test):
     """
     Valida um modelo RandomForestClassifier já treinado.
 
