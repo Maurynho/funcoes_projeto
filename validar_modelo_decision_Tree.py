@@ -26,7 +26,7 @@ import numpy as np
 #    Retorno:
 #                   - dicionário com métricas calculadas
 #######################################################################################
-def validar_modelo(modelo, X_test, y_test, y_pred):
+def validar_modelo_decision_tree(modelo, X_test, y_test, y_pred):
 
     resultados = {} # Dicionário com dados de validação
 
