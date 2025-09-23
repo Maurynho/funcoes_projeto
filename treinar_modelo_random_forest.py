@@ -92,4 +92,4 @@ def treinar_modelo_random_forest(
     modelo_pipeline.fit(X_train, y_train)
     y_pred = modelo_pipeline.predict(X_test)
 
-    return n_s
+    return modelo_pipeline, X_test, y_test, y_pred
