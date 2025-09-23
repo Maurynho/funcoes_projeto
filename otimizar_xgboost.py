@@ -1,3 +1,7 @@
+from sklearn.model_selection import train_test_split, GridSearchCV, RandomizedSearchCV, cross_val_score
+from xgboost import XGBClassifier
+import optuna
+
 def otimizar_xgboost(
                         dados,                       # DataFrame completo já tratado
                         variavel_alvo,               # nome da coluna alvo
@@ -91,7 +95,7 @@ def otimizar_xgboost(
                 'reg_lambda': trial.suggest_float('reg_lambda', 0.5, 2.0),
                 'n_jobs': n_jobs,
                 'random_state': random_state,
-                'use_label_encoder': False,
+                #'use_label_encoder': False,
                 'eval_metric': 'logloss'
             }
 
