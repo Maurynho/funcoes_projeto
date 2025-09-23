@@ -3,18 +3,20 @@
 # Suporta GridSearchCV, RandomizedSearchCV e Optuna
 #######################################################################################
 import optuna
-from sklearn.model_selection import GridSearchCV, RandomizedSearchCV, cross_val_score
+from sklearn.model_selection import GridSearchCV, RandomizedSearchCV, cross_val_score, train_test_split
 from xgboost import XGBClassifier
 
 def otimizar_xgboost(
-                        X_train, 
-                        y_train,
-                        metodo="grid",                # 'grid', 'random', 'optuna'
-                        scoring="f1",                 # métrica de avaliação
-                        cv=3,                         # nº de folds de validação cruzada
-                        n_jobs=-1,                    # núcleos paralelos
-                        n_iter=20,                    # nº de iterações (apenas para random e optuna)
-                        param_grid=None               # dicionário de parâmetros (para grid/random)
+                        dados,                       # DataFrame completo já tratado
+                        variavel_alvo,               # nome da coluna alvo
+                        metodo="grid",               # 'grid', 'random', 'optuna'
+                        scoring="f1",                # métrica de avaliação
+                        cv=3,                        # nº de folds de validação cruzada
+                        n_jobs=-1,                   # núcleos paralelos
+                        n_iter=20,                   # nº de iterações (random/optuna)
+                        param_grid=None,             # dicionário de parâmetros (grid/random)
+                        test_size=0.2,               # tamanho do conjunto de teste
+                        random_state=42              # semente para reprodutibilidade
                     ):
     """
     Otimiza hiperparâmetros do XGBoost usando GridSearchCV, RandomizedSearchCV ou Optuna.
@@ -22,11 +24,20 @@ def otimizar_xgboost(
     Retorna: (modelo_melhor, melhores_parametros, melhor_score)
     """
 
+    # Separar features e alvo
+    X = dados.drop(variavel_alvo, axis=1)
+    y = dados[variavel_alvo]
+
+    # Divisão treino/teste
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=test_size, random_state=random_state, stratify=y
+    )
+
     # Modelo base
     xgb = XGBClassifier(
         use_label_encoder=False,
         eval_metric="logloss",
-        random_state=42
+        random_state=random_state
     )
 
     # Caso 1 - GridSearchCV
@@ -70,7 +81,7 @@ def otimizar_xgboost(
             n_iter=n_iter,
             scoring=scoring,
             cv=cv,
-            random_state=42,
+            random_state=random_state,
             n_jobs=n_jobs,
             verbose=1
         )
@@ -91,7 +102,7 @@ def otimizar_xgboost(
                 'reg_alpha': trial.suggest_float('reg_alpha', 0, 1.0),
                 'reg_lambda': trial.suggest_float('reg_lambda', 0.5, 2.0),
                 'n_jobs': n_jobs,
-                'random_state': 42,
+                'random_state': random_state,
                 'use_label_encoder': False,
                 'eval_metric': 'logloss'
             }
