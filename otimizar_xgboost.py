@@ -1,11 +1,3 @@
-#######################################################################################
-# Função para otimização de hiperparâmetros do XGBoost
-# Suporta GridSearchCV, RandomizedSearchCV e Optuna
-#######################################################################################
-import optuna
-from sklearn.model_selection import GridSearchCV, RandomizedSearchCV, cross_val_score, train_test_split
-from xgboost import XGBClassifier
-
 def otimizar_xgboost(
                         dados,                       # DataFrame completo já tratado
                         variavel_alvo,               # nome da coluna alvo
@@ -18,20 +10,16 @@ def otimizar_xgboost(
                         test_size=0.2,               # tamanho do conjunto de teste
                         random_state=42              # semente para reprodutibilidade
                     ):
-    """
-    Otimiza hiperparâmetros do XGBoost usando GridSearchCV, RandomizedSearchCV ou Optuna.
 
-    Retorna: (modelo_melhor, melhores_parametros, melhor_score)
-    """
-
-    # Separar features e alvo
-    X = dados.drop(variavel_alvo, axis=1)
+    # Separação das features (X) e da variável alvo (y)
+    X = dados.drop(columns=[variavel_alvo])
     y = dados[variavel_alvo]
 
-    # Divisão treino/teste
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=test_size, random_state=random_state, stratify=y
-    )
+    # Divisão dos dados em treino e teste
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
+    
+    # Restante da sua função...
+
 
     # Modelo base
     xgb = XGBClassifier(
